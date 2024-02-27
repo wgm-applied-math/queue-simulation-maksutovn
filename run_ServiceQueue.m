@@ -51,12 +51,14 @@ NInSystem = vertcat(NInSystemSamples{:});
 % Start with a histogram.  The result is an empirical PDF, that is, the
 % area of the bar at horizontal index n is proportional to the fraction of
 % samples for which there were n customers in the system.
-h = histogram(NInSystem, Normalization="probability", BinMethod="integers");
-
+fig = figure();
+t = tiledlayout(fig, 1, 1);
+ax = nexttile(t);
 % MATLAB-ism: Once you've created a picture, you can use "hold on" to cause
 % further plotting function to work with the same picture rather than
 % create a new one.
-hold on;
+hold(ax,"on");
+h = histogram(ax, NInSystem, Normalization="probability", BinMethod="integers");
 
 % For comparison, plot the theoretical results for a M/M/1 queue.
 % The agreement isn't all that good unless you run for a long time, say
@@ -84,9 +86,7 @@ plot(wh, P2, 'o', MarkerEdgeColor='k', MarkerFaceColor='b');
 % save it as a PDF and it doesn't fill a whole page.
 % gcf is "get current figure handle"
 % See https://stackoverflow.com/a/18868933/2407278
-fig = figure();
-t = tiledlayout(fig, 1, 1);
-ax = nexttile(t);
+
 fig = gcf;
 fig.Units = 'inches';
 screenposition = fig.Position;

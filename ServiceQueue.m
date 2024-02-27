@@ -253,7 +253,7 @@ classdef ServiceQueue < handle
             if NInSystem > 1
                 service_time = random(obj.ServiceDistHelper);
             else
-                service_time = andom(obj.ServiceDist);
+                service_time = random(obj.ServiceDist);
             end
 
        
@@ -311,8 +311,10 @@ classdef ServiceQueue < handle
         function record_log(obj)
             % record_log Record a summary of the service queue state.
 
-           
+            NWaiting = length(obj.Waiting);
+            NInService = obj.NumServers - sum(obj.ServerAvailable);
             NServed = length(obj.Served);
+            NInSystem = NWaiting + NInService;
 
             % MATLAB-ism: This is how to add a row to the end of a table.
             obj.Log(end+1, :) = {obj.Time, NWaiting, NInService, NServed};
