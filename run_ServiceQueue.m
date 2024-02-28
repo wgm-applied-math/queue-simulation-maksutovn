@@ -19,7 +19,7 @@ NInSystemSamples = cell([1, n_samples]);
 % the log interval should be long enough for several arrival and departure
 % events happen.
 for sample_num = 1:n_samples
-    q = ServiceQueue(DepartureRate=1/1.5, DepartureRateHelper=1, LogInterval=100);
+    q = ServiceQueue(DepartureRate=1/1.5, DepartureRateHelper=1, LogInterval=200);
     q.schedule_event(Arrival(1, Customer(1)));
     run_until(q, max_time);
     % Pull out samples of the number of customers in the queue system. Each
@@ -66,6 +66,7 @@ h = histogram(ax, NInSystem, Normalization="probability", BinMethod="integers");
 rho1 = q.ArrivalRate / q.DepartureRate;
 rho2 = q.ArrivalRate / q.DepartureRateHelper;
 P0 = 1 - rho1;
+P20 = 1 - rho2;
 nMax = 10;
 ns = 0:nMax;
 wh = 0:nMax;
