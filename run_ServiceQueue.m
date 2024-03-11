@@ -66,7 +66,7 @@ h = histogram(ax, NInSystem, Normalization="probability", BinMethod="integers");
 rho1 = q.ArrivalRate / q.DepartureRate;
 rho2 = q.ArrivalRate / q.DepartureRateHelper;
 P0 = 1 - rho1;
-P20 = 1 - rho2;
+P20 = 1/(1+ (rho1/(1-rho2));
 nMax = 10;
 ns = 0:nMax;
 wh = 0:nMax;
@@ -80,7 +80,7 @@ end
 
 plot(ns, P, 'o', MarkerEdgeColor='k', MarkerFaceColor='r');
 for n = 1:nMax
-    P2(1+n) = P0 * rho1 * rho2^(n-1);
+    P2(1+n) = P20 * rho1 * rho2^(n-1);
 end
 plot(wh, P2, 'o', MarkerEdgeColor='k', MarkerFaceColor='b');
 
