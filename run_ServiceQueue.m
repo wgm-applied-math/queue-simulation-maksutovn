@@ -73,14 +73,14 @@ wh = 0:nMax;
 P = zeros([1, nMax+1]);
 P2 = zeros([1, nMax+1]);
 P(1) = P0;
-P2(1) = P20;
+P2(1) = P0;
 for n = 1:nMax
     P(1+n) = P0 * rho1^n;
 end
 
 plot(ns, P, 'o', MarkerEdgeColor='k', MarkerFaceColor='r');
 for n = 1:nMax
-    P2(1+n) = P20 * rho1 * rho2^(n-1);
+    P2(1+n) = P0 * rho1 * rho2^(n-1);
 end
 plot(wh, P2, 'o', MarkerEdgeColor='k', MarkerFaceColor='b');
 
