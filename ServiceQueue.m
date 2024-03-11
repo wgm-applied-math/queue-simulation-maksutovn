@@ -64,12 +64,12 @@ classdef ServiceQueue < handle
         % vector.  When a serving station is available, the first Customer
         % is removed from Waiting and moved to the corresponding slot in
         % Servers.
-        Waiting;
+        Waiting = {};
 
         % Served - Cell array row vector of Customer objects. Initially
         % empty.  When a Customer's service is complete, the Customer
         % object is moved from its slot in Servers to the end of Served.
-        Served;
+        Served = {};
 
         % Log - Table of log entries. Its columns are 'Time', 'NWaiting',
         % 'NInService', 'NServed', meaning: time, how many customers are
