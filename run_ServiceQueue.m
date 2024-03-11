@@ -77,6 +77,7 @@ P2(1) = P0;
 for n = 1:nMax
     P(1+n) = P0 * rho1^n;
 end
+
 plot(ns, P, 'o', MarkerEdgeColor='k', MarkerFaceColor='r');
 for n = 1:nMax
     P2(1+n) = P0 * rho1 * rho2^(n-1);
