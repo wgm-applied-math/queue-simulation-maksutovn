@@ -73,7 +73,7 @@ wh = 0:nMax;
 P = zeros([1, nMax+1]);
 P2 = zeros([1, nMax+1]);
 P(1) = P0;
-P2(1) = P0;
+P2(1) = P20;
 for n = 1:nMax
     P(1+n) = P0 * rho1^n;
 end
