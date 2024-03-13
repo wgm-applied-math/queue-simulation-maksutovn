@@ -11,7 +11,8 @@ max_time = 1000;
 
 % Record how many customers are in the system at the end of each sample.
 NInSystemSamples = cell([1, n_samples]);
-
+TimeInSystemSamples = cell([1, n_samples]);
+TimeWaitingSamples = cell([1, n_samples]);
 %% Run the queue simulation
 
 
@@ -28,8 +29,9 @@ for sample_num = 1:n_samples
     % counts, because tables like q.Log allow easy extraction of whole
     % columns like this.
     NInSystemSamples{sample_num} = q.Log.NWaiting + q.Log.NInService;
-    %TimeInSystemSamples(sample_num) = ... 
-    %cellfun(' @(c) c.DeprartureTime = c.ArrivalTime, q.Served');
+    TimeInSystemSamples{sample_num} = ... 
+    cellfun(@(c) c.DepartureTime - c.ArrivalTime, q.Served');
+    TimeWaitingSamples{sample_num} = q.Log.NWaiting;
 
 end
 
@@ -37,8 +39,8 @@ end
 % meaning it joins a bunch of arrays vertically, which in this case results
 % in one tall column.
 NInSystem = vertcat(NInSystemSamples{:});
-%TimeInSystem = vertcat(TimeInSystemSamples{:});
-%TimeWaiting = vertcat(TimeWaitingSamples{:});
+TimeInSystem = vertcat(TimeInSystemSamples{:});
+TimeWaiting = vertcat(TimeWaitingSamples{:});
 %TimeBeingServed = vertcat(TimeBeingServedSamples{:});
 
 
@@ -67,9 +69,7 @@ ax = nexttile(t);
 % create a new one.
 hold(ax,"on");
 h = histogram(ax, NInSystem, Normalization="probability", BinMethod="integers");
-%exportgraphics(fig, ...
-    %sprintf("Time in system histogram =%s.pdf", ...
-   % string(q.instanteneousHelper)));
+
 
 % For comparison, plot the theoretical results for a M/M/1 queue.
 % The agreement isn't all that good unless you run for a long time, say
@@ -89,19 +89,27 @@ for n = 1:nMax
     P(1+n) = P0 * rho1^n;
 end
 
-plot(ns, P, 'o', MarkerEdgeColor='k', MarkerFaceColor='r');
+plot(ax,ns, P, 'o', MarkerEdgeColor='k', MarkerFaceColor='r');
 for n = 1:nMax
     P2(1+n) = P20 * rho1 * rho2^(n-1);
 end
-plot(wh, P2, 'o', MarkerEdgeColor='k', MarkerFaceColor='b');
+plot(ax,wh, P2, 'o', MarkerEdgeColor='k', MarkerFaceColor='b');
 
-% This sets some paper-related properties of the figure so that you can
-% save it as a PDF and it doesn't fill a whole page.
-% gcf is "get current figure handle"
-% See https://stackoverflow.com/a/18868933/2407278
+exportgraphics(fig, "Number in system histogram.pdf");
+ %% time_spent
+ fig = figure();
+ t = tiledlayout(fig, 1, 1);
+ ax = nexttile(t);
+ hold(ax,"on");
+ h = histogram(ax, TimeInSystem, Normalization="probability");
+ title(ax,"Time in system spent")
+ exportgraphics(fig, "Time in system histogram.pdf");
+%% Time waiting
+fig = figure();
+t = tiledlayout(fig, 1, 1);
+ax = nexttile(t);
+hold(ax,"on");
+h = histogram(ax, TimeWaiting, Normalization="probability");
+title(ax,"Time waiting")
+exportgraphics(fig, "Time waiting histogram.pdf");
 
-fig = gcf;
-fig.Units = 'inches';
-screenposition = fig.Position;
-fig.PaperPosition = [0 0 screenposition(3:4)];
-fig.PaperSize = [screenposition(3:4)];
