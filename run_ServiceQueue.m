@@ -13,6 +13,7 @@ max_time = 1000;
 NInSystemSamples = cell([1, n_samples]);
 TimeInSystemSamples = cell([1, n_samples]);
 TimeWaitingSamples = cell([1, n_samples]);
+TimeBeingServedSamples = cell([1, n_samples]);
 %% Run the queue simulation
 
 
@@ -21,7 +22,7 @@ TimeWaitingSamples = cell([1, n_samples]);
 % the log interval should be long enough for several arrival and departure
 % events happen.
 for sample_num = 1:n_samples
-    q = ServiceQueue(DepartureRate=1/1.5, DepartureRateHelper=1, LogInterval=200);
+    q = ServiceQueue(DepartureRate=1/1.5, DepartureRateHelper=1/1.5, LogInterval=200);
     q.schedule_event(Arrival(1, Customer(1)));
     run_until(q, max_time);
     % Pull out samples of the number of customers in the queue system. Each
@@ -31,7 +32,10 @@ for sample_num = 1:n_samples
     NInSystemSamples{sample_num} = q.Log.NWaiting + q.Log.NInService;
     TimeInSystemSamples{sample_num} = ... 
     cellfun(@(c) c.DepartureTime - c.ArrivalTime, q.Served');
-    TimeWaitingSamples{sample_num} = q.Log.NWaiting;
+    TimeWaitingSamples{sample_num} = ...
+    cellfun(@(c) c.BeginServiceTime - c.ArrivalTime, q.Served');
+    TimeBeingServedSamples{sample_num} = ...
+        cellfun(@(c) c.DepartureTime - c.BeginServiceTime, q.Served');
 
 end
 
@@ -41,7 +45,7 @@ end
 NInSystem = vertcat(NInSystemSamples{:});
 TimeInSystem = vertcat(TimeInSystemSamples{:});
 TimeWaiting = vertcat(TimeWaitingSamples{:});
-%TimeBeingServed = vertcat(TimeBeingServedSamples{:});
+TimeBeingServed = vertcat(TimeBeingServedSamples{:});
 
 
 % MATLAB-ism: When you pull multiple items from a cell array, the result is
@@ -69,6 +73,7 @@ ax = nexttile(t);
 % create a new one.
 hold(ax,"on");
 h = histogram(ax, NInSystem, Normalization="probability", BinMethod="integers");
+%h = histogram(ax, TimeWaiting, Normalization="probability", BinMethod="integers");
 
 
 % For comparison, plot the theoretical results for a M/M/1 queue.
@@ -101,15 +106,28 @@ exportgraphics(fig, "Number in system histogram.pdf");
  t = tiledlayout(fig, 1, 1);
  ax = nexttile(t);
  hold(ax,"on");
- h = histogram(ax, TimeInSystem, Normalization="probability");
- title(ax,"Time in system spent")
+ h = histogram(ax, TimeInSystem, Normalization="probability",BinEdges=0:0.5:25);
+ title(ax,"Time in system WITHOUT HELPER")
+ ylabel(ax, "Probability");
+ xlabel(ax,"Time in minutes")
  exportgraphics(fig, "Time in system histogram.pdf");
 %% Time waiting
 fig = figure();
 t = tiledlayout(fig, 1, 1);
 ax = nexttile(t);
 hold(ax,"on");
-h = histogram(ax, TimeWaiting, Normalization="probability");
-title(ax,"Time waiting")
+h = histogram(ax, TimeWaiting, Normalization="probability", BinEdges=0:0.5:25);
+title(ax,"Time waiting WITHOUT HELPER")
+ylabel(ax, "Probability");
+xlabel(ax,"Time in minutes")
 exportgraphics(fig, "Time waiting histogram.pdf");
-
+%% Time Being Served
+fig = figure();
+t = tiledlayout(fig, 1, 1);
+ax = nexttile(t);
+hold(ax,"on");
+h = histogram(ax, TimeWaiting, Normalization="probability",BinEdges=0:0.5:25);
+title(ax,"Time being served WITHOUT HELPER")
+ylabel(ax, "Probability");
+xlabel(ax,"Time in minutes")
+exportgraphics(fig, "Time being served.pdf");
